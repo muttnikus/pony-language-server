@@ -52,10 +52,10 @@ actor Main
               U16(65535)
             end
           TCPLanguageServer(
-            env, // TODO: narrow down what needs to be passed
             env.root as TCPListenerAuth,
             host,
             port,
+            dispatcher,
             logger)
         else
           logger(Error) and logger.log("Unable to spawn TCP server for " + tcp)

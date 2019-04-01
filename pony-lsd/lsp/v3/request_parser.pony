@@ -38,7 +38,7 @@ class RequestParser is Iterator[ParseResult]
       recover val
         consume data
       end)
-    _logger(Fine) and _logger.log("DATA: |" + _data.string() + "|")
+    //_logger(Fine) and _logger.log("DATA: |" + _data.string() + "|")
     _parse_requests()
 
   fun ref _parse_requests() =>
@@ -71,7 +71,7 @@ class RequestParser is Iterator[ParseResult]
       let headers = _data.take(index + 2)
       _data = _data.drop(index + 4) // cut off headers
       // look for Content-Length header
-      _logger(Fine) and _logger.log("HEADERS: |" + headers.string() + "|")
+      //_logger(Fine) and _logger.log("HEADERS: |" + headers.string() + "|")
       match headers.find(_cl)
       | (true, let cl_index: USize) =>
         let cl_value =
@@ -84,7 +84,7 @@ class RequestParser is Iterator[ParseResult]
           end
         // extract header value as U64
         try
-          _logger(Fine) and _logger.log("Content-Length: |" + cl_value.string() + "|")
+          //_logger(Fine) and _logger.log("Content-Length: |" + cl_value.string() + "|")
           _expected_body_size = cl_value.string().usize()?
           _logger(Fine) and _logger.log("Content-Length: " + _expected_body_size.string())
         else
@@ -106,7 +106,7 @@ class RequestParser is Iterator[ParseResult]
 
   fun ref _parse_body(): Bool =>
     // TODO: determine minimum size of a JSONRPC message
-    _logger(Fine) and _logger.log("BODY TO PARSE: [" + _data.string() + "]")
+    //_logger(Fine) and _logger.log("BODY TO PARSE: [" + _data.string() + "]")
     if _expected_body_size < 10 then
       // invalid or missing Content-Length
       _logger(Fine) and _logger.log("invalid Content-Length of " + _expected_body_size.string())
@@ -119,7 +119,7 @@ class RequestParser is Iterator[ParseResult]
       _data = _data.drop(_expected_body_size)
       _expected_body_size = 0
       _state = _ExpectHeaders
-      _logger(Fine) and _logger.log("body parsed. " + _data.size().string() + " bytes left to parse.")
+      //_logger(Fine) and _logger.log("body parsed. " + _data.size().string() + " bytes left to parse.")
       _data.size() > 0 // carry on if stuff is available
     else
       false

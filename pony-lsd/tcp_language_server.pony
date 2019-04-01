@@ -1,18 +1,19 @@
 use "net"
 use "logger"
+use jsonrpc = "jsonrpc"
 
 actor TCPLanguageServer
   let _listener: TCPListener
   let _logger: Logger[String]
 
   new create(
-    env: Env,
     auth: TCPListenerAuth,
     host: String,
     port: U16,
+    dispatcher: jsonrpc.Dispatcher,
     logger: Logger[String])
   =>
-    let notify = LanguageServerNotify.create(env, logger)
+    let notify = LanguageServerNotify.create(dispatcher, logger)
     _listener =
       TCPListener(
         auth,
@@ -27,12 +28,12 @@ actor TCPLanguageServer
 
 
 class iso LanguageServerNotify is TCPListenNotify
-  let _env: Env
+  let _dispatcher: jsonrpc.Dispatcher
   let _logger: Logger[String]
   var _connection_count: U64 = 0
 
-  new iso create(env: Env, logger: Logger[String]) =>
-    _env = env
+  new iso create(dispatcher: jsonrpc.Dispatcher, logger: Logger[String]) =>
+    _dispatcher = dispatcher
     _logger = logger
 
   fun ref listening(listen: TCPListener ref) =>
@@ -54,21 +55,23 @@ class iso LanguageServerNotify is TCPListenNotify
     _logger(Info) and _logger.log("TCP closed.")
 
   fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
-    ConnectionNotify.create(_env, _logger, _connection_count = _connection_count + 1)
+    ConnectionNotify.create(_dispatcher, _logger, _connection_count = _connection_count + 1)
 
 
 class ConnectionNotify is TCPConnectionNotify
-  let _env: Env
+  let _dispatcher: jsonrpc.Dispatcher
   let _logger: Logger[String]
   let _id: U64
+  var _handler: (RequestHandler | None) = None
 
-  new iso create(env: Env, logger: Logger[String], id: U64) =>
-    _env = env
+  new iso create(dispatcher: jsonrpc.Dispatcher, logger: Logger[String], id: U64) =>
+    _dispatcher = dispatcher
     _logger = logger
     _id = id
 
   fun ref accepted(conn: TCPConnection ref) =>
-    _logger(Fine) and _logger.log("connection " + _id.string() + " accepted.")
+    _logger(Fine) and _logger.log("connection " + _id.string() + " accepted. Initializing request handler.")
+    _handler = RequestHandler(_dispatcher, _logger, conn)
 
   fun ref received(
     conn: TCPConnection ref,
@@ -76,6 +79,11 @@ class ConnectionNotify is TCPConnectionNotify
     times: USize)
     : Bool
   =>
+    try
+      (_handler as RequestHandler).apply(consume data)
+    else
+      _logger(Fine) and _logger.log("Connection " + _id.string() + " _handler is None. :(")
+    end
     true
 
   fun ref connect_failed(conn: TCPConnection ref) =>
