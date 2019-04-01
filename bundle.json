@@ -1,0 +1,18 @@
+{
+  "deps": [
+    {
+      "tag": "master",
+      "type": "github",
+      "repo": "mfelsche/pony-rope"
+    },
+    {
+      "tag": "master",
+      "type": "github",
+      "repo": "mfelsche/pony-json-rpc"
+    },
+    {
+      "type": "github",
+      "repo": "mfelsche/pony-maybe"
+    }
+  ]
+}
