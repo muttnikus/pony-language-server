@@ -1,3 +1,5 @@
 /.deps/
 /build/
 pony-lsd.log
+/_corral/
+/_repos/

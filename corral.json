@@ -1,0 +1,28 @@
+{
+  "packages": [
+    "pony-lsd",
+    "pony-lsd/lsp/v3"
+  ],
+  "deps": [
+    {
+      "locator": "github.com/muttnikus/pony-maybe.git",
+      "version": "master"
+    },
+    {
+      "locator": "github.com/muttnikus/pony-rope.git",
+      "version": "master"
+    },
+    {
+      "locator": "github.com/muttnikus/pony-json-rpc.git",
+      "version": "master"
+    }
+  ],
+  "info": {
+    "description": "Language server for Pony",
+    "homepage": "https://github.com/ponylang/pony-language-server",
+    "license": "",
+    "documentation_url": "https://github.com/ponylang/pony-language-server",
+    "version": "0.1.0",
+    "name": "pony-lsd"
+  }
+}
