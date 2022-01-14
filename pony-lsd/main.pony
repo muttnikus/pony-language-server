@@ -3,10 +3,12 @@ use "net"
 use "logger"
 use jsonrpc = "jsonrpc"
 
+use @getpid[I32]()
+
 actor Main
 
   new create(env: Env) =>
-    let pid: I32 = @getpid[I32]()
+    let pid: I32 = @getpid()
     let cs =
       try
         CommandSpec.leaf(
