@@ -9,7 +9,8 @@ actor StdinStdoutLanguageServer
              dispatcher: jsonrpc.Dispatcher,
              logger: Logger[String],
              chunk_size: USize = 512) =>
-    let request_handler = recover iso RequestHandler(dispatcher, logger, out_stream) end
+    let out_stream' = AutoFlushableStream(out_stream)
+    let request_handler = recover iso RequestHandler(dispatcher, logger, out_stream') end
     in_stream.apply(StdinNotify(logger, consume request_handler), chunk_size)
 
 class iso StdinNotify is InputNotify
@@ -30,3 +31,13 @@ class iso StdinNotify is InputNotify
   fun ref dispose() =>
     _logger(Info) and _logger.log("EOF on STDIN.")
     _handler.dispose()
+
+actor AutoFlushableStream
+  let _out_stream: OutStream
+
+  new create(out_stream: OutStream) =>
+    _out_stream = out_stream
+
+  be write(data: ByteSeq) =>
+    _out_stream.write(data)
+    _out_stream.flush()

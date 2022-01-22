@@ -6,7 +6,7 @@ interface val Jsonable
   fun box to_json(): String
 
 interface tag AsyncWritable
-  be write(daya: ByteSeq)
+  be write(data: ByteSeq)
 
 class val ResponseWriter
   let _stream: AsyncWritable
@@ -29,4 +29,3 @@ class val ResponseWriter
       .>append(payload)
     end
     _stream.write(consume s)
-

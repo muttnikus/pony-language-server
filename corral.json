@@ -5,7 +5,11 @@
   ],
   "deps": [
     {
-      "locator": "github.com/muttnikus/pony-maybe.git",
+      "locator": "github.com/muttnikus/pony-json-rpc.git",
+      "version": "master"
+    },
+    {
+      "locator": "github.com/muttnikus/pony-immutable-json.git",
       "version": "master"
     },
     {
@@ -13,7 +17,7 @@
       "version": "master"
     },
     {
-      "locator": "github.com/muttnikus/pony-json-rpc.git",
+      "locator": "github.com/muttnikus/pony-maybe.git",
       "version": "master"
     }
   ],

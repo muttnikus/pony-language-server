@@ -1,9 +1,12 @@
 use "cli"
 use "net"
 use "logger"
-use jsonrpc = "jsonrpc"
+use jrpc = "jsonrpc"
+use "initializer"
+use "promises"
 
 use @getpid[I32]()
+
 
 actor Main
 
@@ -40,7 +43,7 @@ actor Main
     let logger = StringLogger(if debug then Fine else Info end, env.err)
     logger(Fine) and logger.log("PID: " + pid.string())
 
-    let dispatcher = jsonrpc.Dispatcher.create()
+    let dispatcher = _create_dispatcher(logger)
     let tcp = cmd.option("tcp").string()
     let tcp_server =
       if tcp.size() > 0 then
@@ -72,4 +75,14 @@ actor Main
         dispatcher,
         logger)
 
+  fun box _create_dispatcher(logger: Logger[String]): jrpc.Dispatcher =>
+    let dispatcher = jrpc.Dispatcher.create()
 
+    let initializer = Initializer(logger)
+
+    dispatcher.register_handler("initialize", object is jrpc.MethodHandler
+      be handle(request: jrpc.Request val, p: Promise[jrpc.Response val]) =>
+        initializer.initialize(request, p)
+    end)
+
+    dispatcher

@@ -24,10 +24,12 @@ class RequestHandler
     match pr
     | let req: jsonrpc.Request val =>
       _logger(Fine) and _logger.log("<===\n\t" + req.to_json())
+
       let res_promise: Promise[jsonrpc.Response] = _dispatcher(req)
       if not req.is_notification() then
         res_promise.next[(jsonrpc.Response | jsonrpc.BatchResponse)]({(r) => r})
       end
+
     | let batch_req: jsonrpc.BatchRequest =>
       _logger(Fine) and _logger.log(batch_req.to_json())
       let responses = Array[Promise[jsonrpc.Response]](batch_req.size())
@@ -46,12 +48,15 @@ class RequestHandler
           .next[(jsonrpc.Response | jsonrpc.BatchResponse)](
             {(responses) => jsonrpc.BatchResponse(responses) })
       end
+
     | let invalidJson: jsonrpc.InvalidJson =>
       _logger(Warn) and _logger.log("invalid JSON")
       response_promise(jsonrpc.Response.from_error(None, jsonrpc.Error.parse_error()))
+
     | let invalidJsonRPCRequest: jsonrpc.InvalidRequest =>
       _logger(Warn) and _logger.log("invalid JSONRPC message.")
       response_promise(jsonrpc.Response.from_error(None, jsonrpc.Error.invalid_request()))
+
     | let lspErr: LSPV3RequestParseError =>
       _logger(Warn) and _logger.log("invalid LSPV3 message.")
       response_promise(jsonrpc.Response.from_error(None, jsonrpc.Error.invalid_request()))

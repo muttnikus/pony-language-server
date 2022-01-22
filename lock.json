@@ -1,10 +1,6 @@
 {
   "locks": [
     {
-      "locator": "github.com/muttnikus/pony-json-rpc.git",
-      "revision": "master"
-    },
-    {
       "locator": "github.com/muttnikus/pony-immutable-json.git",
       "revision": "master"
     },
@@ -14,6 +10,10 @@
     },
     {
       "locator": "github.com/muttnikus/pony-maybe.git",
+      "revision": "master"
+    },
+    {
+      "locator": "github.com/muttnikus/pony-json-rpc.git",
       "revision": "master"
     }
   ]
